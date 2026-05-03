@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from app.schemas.models import ApiResponse
+from app.type.response import ApiResponse
 
 
 def _http_detail_message(detail: str | dict | list) -> str:
