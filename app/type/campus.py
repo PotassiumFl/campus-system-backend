@@ -7,7 +7,6 @@ class CampusBody(BaseModel):
 
 class CreateCampusBody(CampusBody):
     name: str = Field(..., max_length=64)
-    address: str = Field(..., max_length=255)
 
 class UpdateCampusBody(CampusBody):
     id: int = Field(...)

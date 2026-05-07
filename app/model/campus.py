@@ -35,8 +35,8 @@ def listCampus() -> list[dict]:
 
 
 def updateCampus(body: campus.UpdateCampusBody) -> dict | None:
-    set_parts: list[str] = []
-    params: list = []
+    set_parts = []
+    params = []
     if body.name is not None:
         set_parts.append("campus_name = %s")
         params.append(body.name)

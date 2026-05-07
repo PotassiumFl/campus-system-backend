@@ -8,5 +8,5 @@ from app.type.response import ApiResponse
 router = APIRouter()
 
 @router.post("/upload", response_model=ApiResponse, status_code=status.HTTP_201_CREATED)
-async def upload(body: list[campus_type.CreateCampusBody]) -> ApiResponse:
+async def upload(body: campus_type.CreateCampusBody) -> ApiResponse:
     return campus_controller.uploadCampus(body)
