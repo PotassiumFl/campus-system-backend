@@ -15,24 +15,23 @@ class FacilityType(Enum):
 
 
 class FacilityBody(BaseModel):
-    id: int | None = Field(default=None)
+    facility_id: int | None = Field(default=None)
     building_id: int | None = Field(default=None)
-    name: str | None = Field(default=None, max_length = 64)
-    type: FacilityType | None = Field(default=None)
+    facility_name: str | None = Field(default=None, max_length = 64)
+    facility_type: FacilityType | None = Field(default=None)
     openTime: str | None = Field(default=None, max_length = 128)
 
 
 class CreateFacilityBody(FacilityBody):
     building_id: int = Field(...)
-    name: str = Field(...)
-    type: FacilityType = Field(...)
+    facility_name: str = Field(...)
+    facility_type: FacilityType = Field(...)
 
 
-class UploadFacilityBody(BaseModel):
+class UploadFacilityBody(FacilityBody):
     building_name: str = Field(..., max_length=64)
     facility_name: str = Field(..., max_length=64)
     facility_type: FacilityType = Field(default=FacilityType.other)
-    openTime: str | None = Field(default=None, max_length=128)
 
     @field_validator("openTime", mode="before")
     @classmethod
@@ -43,4 +42,20 @@ class UploadFacilityBody(BaseModel):
 
 
 class UpdateFacilityBody(FacilityBody):
-    id: int = Field(...)
+    facility_id: int = Field(...)
+
+
+class RemoveFacilityBody(FacilityBody):
+    facility_id: int = Field(...)
+
+
+class SearchFacilityBody(FacilityBody):
+    building_name: str | None = Field(default=None, max_length=64)
+    facility_name: str | None = Field(default=None, max_length=64)
+
+
+class FilterFacilityBody(BaseModel):
+    building_name: list[str] = Field(default_factory=list)
+    facility_name: list[str] = Field(default_factory=list)
+    facility_type: list[FacilityType] = Field(default_factory=list)
+    open_time: list[str] = Field(default_factory=list)

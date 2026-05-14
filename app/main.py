@@ -5,7 +5,7 @@ from app.routers import register_routers
 
 
 def create_app() -> FastAPI:
-    app = FastAPI()
+    app = FastAPI(title="DBDesignPy API", version="1.0.0")
     register_exception_handlers(app)
     register_routers(app)
     return app

@@ -1,12 +1,12 @@
 from starlette import status
 
 import app.model.building as building
-import app.model.facility as facility
-import app.type.facility as facilityType
+import app.model.event as event
+import app.type.event as event_type
 from app.type.response import ApiResponse
 
 
-def uploadFacility(body: facilityType.UploadFacilityBody) -> ApiResponse:
+def uploadEvent(body: event_type.UploadEventBody) -> ApiResponse:
     row = building.getBuildingByName(body.building_name)
     if row is None:
         return ApiResponse(
@@ -15,12 +15,14 @@ def uploadFacility(body: facilityType.UploadFacilityBody) -> ApiResponse:
             message="Building not found",
             data=None,
         )
-    created = facility.createFacility(
-        facilityType.CreateFacilityBody(
+    created = event.createEvent(
+        event_type.CreateEventBody(
             building_id=row["building_id"],
-            facility_name=body.facility_name,
-            facility_type=body.facility_type,
-            openTime=body.openTime,
+            event_name=body.event_name,
+            start_time=body.start_time,
+            end_time=body.end_time,
+            organizer=body.organizer,
+            description=body.description,
         )
     )
     return ApiResponse(
@@ -31,11 +33,11 @@ def uploadFacility(body: facilityType.UploadFacilityBody) -> ApiResponse:
     )
 
 
-def searchFacility(body: facilityType.SearchFacilityBody) -> ApiResponse:
-    rows = facility.searchFacilities(
+def searchEvent(body: event_type.SearchEventBody) -> ApiResponse:
+    rows = event.searchEvents(
         building_name=body.building_name,
-        facility_name=body.facility_name,
-        open_time=None,
+        event_name=body.event_name,
+        organizer=body.organizer,
     )
     return ApiResponse(
         success=True,
@@ -45,12 +47,13 @@ def searchFacility(body: facilityType.SearchFacilityBody) -> ApiResponse:
     )
 
 
-def filterFacility(body: facilityType.FilterFacilityBody) -> ApiResponse:
-    rows = facility.filterFacilities(
+def filterEvent(body: event_type.FilterEventBody) -> ApiResponse:
+    rows = event.filterEvents(
         building_name=body.building_name,
-        facility_name=body.facility_name,
-        facility_type=body.facility_type,
-        open_time=body.open_time,
+        event_name=body.event_name,
+        organizer=body.organizer,
+        start_time=body.start_time,
+        end_time=body.end_time,
     )
     return ApiResponse(
         success=True,
@@ -60,13 +63,13 @@ def filterFacility(body: facilityType.FilterFacilityBody) -> ApiResponse:
     )
 
 
-def updateFacility(body: facilityType.UpdateFacilityBody) -> ApiResponse:
-    existing = facility.getFacilityByID(body.facility_id)
+def updateEvent(body: event_type.UpdateEventBody) -> ApiResponse:
+    existing = event.getEventByID(body.event_id)
     if existing is None:
         return ApiResponse(
             success=False,
             code=status.HTTP_404_NOT_FOUND,
-            message="Facility not found",
+            message="Event not found",
             data=None,
         )
     if body.building_id is not None:
@@ -79,10 +82,12 @@ def updateFacility(body: facilityType.UpdateFacilityBody) -> ApiResponse:
                 data=None,
             )
     if (
-        body.facility_name is None
-        and body.building_id is None
-        and body.facility_type is None
-        and body.openTime is None
+        body.building_id is None
+        and body.event_name is None
+        and body.start_time is None
+        and body.end_time is None
+        and body.organizer is None
+        and body.description is None
     ):
         return ApiResponse(
             success=True,
@@ -90,7 +95,7 @@ def updateFacility(body: facilityType.UpdateFacilityBody) -> ApiResponse:
             message=None,
             data=existing,
         )
-    updated = facility.updateFacility(body)
+    updated = event.updateEvent(body)
     return ApiResponse(
         success=True,
         code=status.HTTP_200_OK,
@@ -99,15 +104,15 @@ def updateFacility(body: facilityType.UpdateFacilityBody) -> ApiResponse:
     )
 
 
-def removeFacility(body: facilityType.RemoveFacilityBody) -> ApiResponse:
-    if facility.getFacilityByID(body.facility_id) is None:
+def removeEvent(body: event_type.RemoveEventBody) -> ApiResponse:
+    if event.getEventByID(body.event_id) is None:
         return ApiResponse(
             success=False,
             code=status.HTTP_404_NOT_FOUND,
-            message="Facility not found",
+            message="Event not found",
             data=None,
         )
-    removed = facility.removeFacilityByID(body.facility_id)
+    removed = event.removeEventByID(body.event_id)
     return ApiResponse(
         success=True,
         code=status.HTTP_200_OK,

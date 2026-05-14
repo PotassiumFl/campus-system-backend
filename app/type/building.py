@@ -9,22 +9,23 @@ class BuildingType(Enum):
     laboratory = "实验楼"
     gym = "体育馆"
     canteen = "食堂"
+    library = "图书馆"
     other = "其他"
 
 class BuildingBody(BaseModel):
-    id: int | None = Field(default=None)
+    building_id: int | None = Field(default=None)
     campus_id: int | None = Field(default=None)
-    name: str | None = Field(default=None, max_length = 64)
-    type: BuildingType | None = Field(default=None)
+    building_name: str | None = Field(default=None, max_length = 64)
+    building_type: BuildingType | None = Field(default=None)
 
 
 class CreateBuildingBody(BuildingBody):
-    name: str = Field(...,max_length=64)
+    building_name: str = Field(...,max_length=64)
     campus_id: int = Field(...)
-    type: BuildingType = Field(BuildingType.other)
+    building_type: BuildingType = Field(BuildingType.other)
 
 
-class UploadBuildingBody(BaseModel):
+class UploadBuildingBody(BuildingBody):
     building_name: str = Field(..., max_length=64)
     campus_name: str = Field(..., max_length=64)
     building_type: BuildingType = Field(default=BuildingType.other)
@@ -36,4 +37,19 @@ class UploadBuildingBody(BaseModel):
 
 
 class UpdateBuildingBody(BuildingBody):
-    id: int = Field(...)
+    building_id: int = Field(...)
+
+
+class RemoveBuildingBody(BuildingBody):
+    building_id: int = Field(...)
+
+
+class SearchBuildingBody(BuildingBody):
+    campus_name: str | None = Field(default=None, max_length=64)
+    building_name: str | None = Field(default=None, max_length=64)
+
+
+class FilterBuildingBody(BaseModel):
+    campus_name: list[str] = Field(default_factory=list)
+    building_name: list[str] = Field(default_factory=list)
+    building_type: list[BuildingType] = Field(default_factory=list)

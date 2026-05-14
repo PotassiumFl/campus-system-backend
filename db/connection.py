@@ -78,3 +78,25 @@ def run(
         return out
     finally:
         conn.close()
+
+
+def insert_returning_last_id(
+    sql: str,
+    params: Sequence[Any] | None = None,
+) -> int:
+    """Execute INSERT on one connection and return ``LAST_INSERT_ID()`` (autoincrement).
+
+    Pooling opens a fresh connection per :func:`run`; this keeps INSERT and
+    ``lastrowid`` on the same session.
+    """
+    conn = _get_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, params if params is not None else None)
+            new_id = cur.lastrowid
+        conn.commit()
+        if new_id is None:
+            raise RuntimeError("INSERT did not produce lastrowid (not an AUTO_INCREMENT insert?)")
+        return int(new_id)
+    finally:
+        conn.close()
