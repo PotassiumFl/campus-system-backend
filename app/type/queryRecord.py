@@ -24,3 +24,17 @@ class CreateQueryRecordBody(QueryRecordBody):
 
 class UpdateQueryRecordBody(QueryRecordBody):
     id: int = Field(...)
+
+
+class SearchQueryRecordBody(BaseModel):
+    user_id: int | None = Field(default=None)
+    query_text: str | None = Field(default=None)
+
+
+class FilterQueryRecordBody(BaseModel):
+    user_id: list[int] = Field(default_factory=list)
+    query_type: list[QueryType] = Field(default_factory=list)
+
+
+class RemoveQueryRecordBody(BaseModel):
+    id: int = Field(...)

@@ -1,4 +1,5 @@
 from db import insert_returning_last_id, run
+from app.list_search import append_in, append_like, compact_ints, non_empty_strs
 import app.type.queryRecord as query_record
 
 
@@ -57,3 +58,39 @@ def updateQueryRecord(body: query_record.UpdateQueryRecordBody) -> dict | None:
         sql = f"UPDATE query_record SET {','.join(set_parts)} WHERE record_id = %s"
         run(sql, params, commit=True)
     return getQueryRecordByID(body.id)
+
+
+def searchQueryRecords(
+    user_id: int | None = None,
+    query_text: str | None = None,
+) -> list[dict]:
+    clauses: list[str] = []
+    params: list = []
+    if user_id is not None:
+        clauses.append("(user_id = %s)")
+        params.append(user_id)
+    append_like(clauses, params, "query_text", query_text)
+    if not clauses:
+        sql = "SELECT * FROM query_record ORDER BY record_id DESC"
+        result = run(sql, [], fetch="all")
+    else:
+        sql = f"SELECT * FROM query_record WHERE {' AND '.join(clauses)} ORDER BY record_id DESC"
+        result = run(sql, params, fetch="all")
+    return result if result else []
+
+
+def filterQueryRecords(
+    user_id: list[int] | None = None,
+    query_type: list[str] | None = None,
+) -> list[dict]:
+    clauses: list[str] = []
+    params: list = []
+    append_in(clauses, params, "user_id", compact_ints(user_id))
+    append_in(clauses, params, "query_type", non_empty_strs(query_type))
+    if not clauses:
+        sql = "SELECT * FROM query_record ORDER BY record_id DESC"
+        result = run(sql, [], fetch="all")
+    else:
+        sql = f"SELECT * FROM query_record WHERE {' AND '.join(clauses)} ORDER BY record_id DESC"
+        result = run(sql, params, fetch="all")
+    return result if result else []

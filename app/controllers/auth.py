@@ -55,11 +55,16 @@ def register(body: user_account_type.AuthRegisterBody) -> ApiResponse:
             data=None,
         )
     hashed = _hash_password(body.password)
+    role = (
+        body.user_role
+        if body.user_role is not None
+        else user_account_type.UserRole.user
+    )
     created = user_account_model.createUserAccount(
         user_account_type.CreateUserAccountBody(
             username=body.username,
             password=hashed,
-            user_role=user_account_type.UserRole.user,
+            user_role=role,
         )
     )
     return ApiResponse(

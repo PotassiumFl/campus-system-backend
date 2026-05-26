@@ -8,6 +8,8 @@ from app.routers import campus
 from app.routers import course
 from app.routers import event
 from app.routers import facility
+from app.routers import query_record
+from app.routers import search
 from app.routers import teach
 from app.routers import teacher
 
@@ -21,3 +23,5 @@ def register_routers(app: FastAPI) -> None:
     app.include_router(event.router, prefix="/event", tags=["event"])
     app.include_router(teacher.router, prefix="/teacher", tags=["teacher"])
     app.include_router(teach.router, prefix="/teach", tags=["teach"])
+    app.include_router(query_record.router, prefix="/query_record", tags=["query_record"])
+    app.include_router(search.router, tags=["search"])
