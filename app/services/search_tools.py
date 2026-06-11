@@ -245,14 +245,15 @@ _TOOL_SPECS: list[tuple[dict[str, Any], str, ToolHandler, type[BaseModel]]] = [
     ),
     _tool(
         "search_teach",
-        "模糊搜索授课记录，可按学期或教学班",
+        "模糊搜索授课记录，可按教师姓名、课程名、课程号、学期或教学班",
         {
             "type": "object",
             "properties": {
+                "teacher_name": {"type": "string"},
+                "course_name": {"type": "string"},
+                "course_id": {"type": "string"},
                 "semester": {"type": "string"},
                 "section_no": {"type": "string"},
-                "course_id": {"type": "string"},
-                "teacher_id": {"type": "integer"},
             },
         },
         teach_controller.searchTeach,
@@ -260,18 +261,13 @@ _TOOL_SPECS: list[tuple[dict[str, Any], str, ToolHandler, type[BaseModel]]] = [
     ),
     _tool(
         "filter_teach",
-        "精确筛选授课记录",
+        "精确筛选授课记录，可按教师姓名、课程名、学期",
         {
             "type": "object",
             "properties": {
-                "teacher_id": {"type": "array", "items": {"type": "integer"}},
-                "course_id": {"type": "array", "items": {"type": "string"}},
-                "semester": {"type": "array", "items": {"type": "string"}},
-                "section_no": {"type": "array", "items": {"type": "string"}},
-                "role": {
-                    "type": "array",
-                    "items": {"type": "string", "enum": ["教师", "助教"]},
-                },
+                "teacher_name": {"type": "string"},
+                "course_name": {"type": "string"},
+                "semester": {"type": "string"},
             },
         },
         teach_controller.filterTeach,

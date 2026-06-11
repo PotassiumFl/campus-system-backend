@@ -48,13 +48,15 @@ class RemoveTeachBody(TeachBody):
     section_no: str = Field(..., max_length=16)
 
 
-class SearchTeachBody(TeachBody):
-    pass
+class SearchTeachBody(BaseModel):
+    teacher_name: str | None = Field(default=None, max_length=64)
+    course_name: str | None = Field(default=None, max_length=64)
+    course_id: str | None = Field(default=None, max_length=16)
+    semester: str | None = Field(default=None, max_length=16)
+    section_no: str | None = Field(default=None, max_length=16)
 
 
 class FilterTeachBody(BaseModel):
-    teacher_id: list[int] = Field(default_factory=list)
-    course_id: list[str] = Field(default_factory=list)
-    semester: list[str] = Field(default_factory=list)
-    section_no: list[str] = Field(default_factory=list)
-    role: list[TeachRole] = Field(default_factory=list)
+    teacher_name: str | None = Field(default=None, max_length=64)
+    course_name: str | None = Field(default=None, max_length=64)
+    semester: str | None = Field(default=None, max_length=16)

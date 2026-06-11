@@ -2,6 +2,14 @@ from db import run
 from app.list_search import append_in, append_like, compact_ints, non_empty_strs
 import app.type.teach as teach
 
+_TEACH_SELECT = (
+    "SELECT t.*, tr.teacher_name, c.course_name, c.credit "
+    "FROM teach t "
+    "LEFT JOIN teacher tr ON t.teacher_id = tr.teacher_id "
+    "LEFT JOIN course c ON t.course_id = c.course_id"
+)
+_TEACH_ORDER = " ORDER BY t.semester, t.section_no, t.course_id, t.teacher_id"
+
 
 def createTeach(body: teach.CreateTeachBody) -> dict | None:
     sql = (
@@ -33,8 +41,8 @@ def getTeachByPrimaryKey(
     section_no: str,
 ) -> dict | None:
     sql = (
-        "SELECT * FROM teach WHERE teacher_id = %s AND course_id = %s "
-        "AND semester = %s AND section_no = %s"
+        f"{_TEACH_SELECT} WHERE t.teacher_id = %s AND t.course_id = %s "
+        "AND t.semester = %s AND t.section_no = %s"
     )
     params = [teacher_id, course_id, semester, section_no]
     return run(sql, params, fetch="one")
@@ -43,16 +51,24 @@ def getTeachByPrimaryKey(
 def searchTeach(
     semester: str | None = None,
     section_no: str | None = None,
+    teacher_id: int | None = None,
+    course_id: str | None = None,
 ) -> list[dict]:
     clauses: list[str] = []
     params: list = []
-    append_like(clauses, params, "semester", semester)
-    append_like(clauses, params, "section_no", section_no)
+    if teacher_id is not None:
+        clauses.append("(t.teacher_id = %s)")
+        params.append(teacher_id)
+    if course_id not in (None, ""):
+        clauses.append("(t.course_id = %s)")
+        params.append(course_id)
+    append_like(clauses, params, "t.semester", semester)
+    append_like(clauses, params, "t.section_no", section_no)
     if not clauses:
-        sql = "SELECT * FROM teach ORDER BY semester, section_no, course_id, teacher_id"
+        sql = f"{_TEACH_SELECT}{_TEACH_ORDER}"
         result = run(sql, [], fetch="all")
     else:
-        sql = f"SELECT * FROM teach WHERE {' AND '.join(clauses)} ORDER BY semester, section_no, course_id, teacher_id"
+        sql = f"{_TEACH_SELECT} WHERE {' AND '.join(clauses)}{_TEACH_ORDER}"
         result = run(sql, params, fetch="all")
     return result if result else []
 
@@ -66,17 +82,17 @@ def filterTeach(
 ) -> list[dict]:
     clauses: list[str] = []
     params: list = []
-    append_in(clauses, params, "teacher_id", compact_ints(teacher_id))
-    append_in(clauses, params, "course_id", non_empty_strs(course_id))
-    append_in(clauses, params, "semester", non_empty_strs(semester))
-    append_in(clauses, params, "section_no", non_empty_strs(section_no))
+    append_in(clauses, params, "t.teacher_id", compact_ints(teacher_id))
+    append_in(clauses, params, "t.course_id", non_empty_strs(course_id))
+    append_in(clauses, params, "t.semester", non_empty_strs(semester))
+    append_in(clauses, params, "t.section_no", non_empty_strs(section_no))
     role_vals = [r.value for r in (role or []) if r is not None]
-    append_in(clauses, params, "teach_role", role_vals)
+    append_in(clauses, params, "t.teach_role", role_vals)
     if not clauses:
-        sql = "SELECT * FROM teach ORDER BY semester, section_no, course_id, teacher_id"
+        sql = f"{_TEACH_SELECT}{_TEACH_ORDER}"
         result = run(sql, [], fetch="all")
     else:
-        sql = f"SELECT * FROM teach WHERE {' AND '.join(clauses)} ORDER BY semester, section_no, course_id, teacher_id"
+        sql = f"{_TEACH_SELECT} WHERE {' AND '.join(clauses)}{_TEACH_ORDER}"
         result = run(sql, params, fetch="all")
     return result if result else []
 
