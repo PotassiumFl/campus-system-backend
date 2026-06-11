@@ -1,4 +1,4 @@
-# DBDesignPy
+# campus-system-backend
 
 校园信息数据库管理系统后端 API。基于 FastAPI 构建，提供校区、建筑、设施、课程、活动、教师等实体的增删改查，并支持通过大语言模型（LLM）进行自然语言查询。
 
@@ -185,18 +185,6 @@ erDiagram
 | 查询记录 | `/query_record` | 同上 |
 | 自然语言搜索 | `/search` | `POST /search` |
 
-启动服务后可访问：
-
-- Swagger UI：`http://127.0.0.1:8000/docs`
-- ReDoc：`http://127.0.0.1:8000/redoc`
-- OpenAPI JSON：`http://127.0.0.1:8000/openapi.json`
-
-也可将根目录 `openapi.json` 导入 Apifox / Postman，或通过脚本重新生成：
-
-```bash
-python scripts/export_openapi.py
-```
-
 ### 自然语言搜索流程
 
 ```mermaid
@@ -232,7 +220,7 @@ sequenceDiagram
 
 ```bash
 git clone <仓库地址>
-cd DBDesignPy
+cd campus-system-backend
 
 python -m venv .venv
 
